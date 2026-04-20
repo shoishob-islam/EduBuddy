@@ -315,18 +315,18 @@ class CurriculumData {
 }
 
 class TopicStorage {
-  static const String _storageKey = 'topics_data';
-
   static Future<void> saveTopics(
-      String department,
-      String year,
-      String semester,
-      List<Course> courses,
-      ) async {
+    String department,
+    String year,
+    String semester,
+    List<Course> courses,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final key = '${department}_${year}_$semester';
-      final List<Map<String, dynamic>> coursesJson = courses.map((c) => c.toJson()).toList();
+      final List<Map<String, dynamic>> coursesJson = courses
+          .map((c) => c.toJson())
+          .toList();
       await prefs.setString(key, jsonEncode(coursesJson));
     } catch (e) {
       print('Error saving topics: $e');
@@ -334,10 +334,10 @@ class TopicStorage {
   }
 
   static Future<List<Course>?> loadTopics(
-      String department,
-      String year,
-      String semester,
-      ) async {
+    String department,
+    String year,
+    String semester,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final key = '${department}_${year}_$semester';
@@ -378,8 +378,10 @@ class _TopicsPageState extends State<TopicsPage> {
   Course? _selectedCourse;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newTopicController = TextEditingController();
-  final TextEditingController _newCourseCodeController = TextEditingController();
-  final TextEditingController _newCourseNameController = TextEditingController();
+  final TextEditingController _newCourseCodeController =
+      TextEditingController();
+  final TextEditingController _newCourseNameController =
+      TextEditingController();
   bool _isLoading = true;
   late UserRole _userRole;
   final Set<String> _selectedTopicIds = {};
@@ -415,7 +417,10 @@ class _TopicsPageState extends State<TopicsPage> {
     if (savedCourses != null && savedCourses.isNotEmpty) {
       _courses = savedCourses;
     } else {
-      _courses = CurriculumData.data[widget.department]?[widget.year]?[widget.semester] ?? [];
+      _courses =
+          CurriculumData.data[widget.department]?[widget.year]?[widget
+              .semester] ??
+          [];
 
       if (_courses.isNotEmpty) {
         await TopicStorage.saveTopics(
@@ -439,20 +444,25 @@ class _TopicsPageState extends State<TopicsPage> {
     if (_searchController.text.isEmpty) {
       _filteredCourses = List.from(_courses);
     } else {
-      _filteredCourses = _courses.map((course) {
-        final filteredTopics = course.topics
-            .where((topic) => topic.name
-            .toLowerCase()
-            .contains(_searchController.text.toLowerCase()))
-            .toList();
+      _filteredCourses = _courses
+          .map((course) {
+            final filteredTopics = course.topics
+                .where(
+                  (topic) => topic.name.toLowerCase().contains(
+                    _searchController.text.toLowerCase(),
+                  ),
+                )
+                .toList();
 
-        return Course(
-          id: course.id,
-          code: course.code,
-          name: course.name,
-          topics: filteredTopics,
-        );
-      }).where((course) => course.topics.isNotEmpty).toList();
+            return Course(
+              id: course.id,
+              code: course.code,
+              name: course.name,
+              topics: filteredTopics,
+            );
+          })
+          .where((course) => course.topics.isNotEmpty)
+          .toList();
     }
     setState(() {});
   }
@@ -466,9 +476,11 @@ class _TopicsPageState extends State<TopicsPage> {
       return;
     }
 
-    final exists = _courses.any((c) =>
-    c.code.toLowerCase() == courseCode.toLowerCase() ||
-        c.name.toLowerCase() == courseName.toLowerCase());
+    final exists = _courses.any(
+      (c) =>
+          c.code.toLowerCase() == courseCode.toLowerCase() ||
+          c.name.toLowerCase() == courseName.toLowerCase(),
+    );
 
     if (exists) {
       _showSnackBar('Course already exists', isError: true);
@@ -508,7 +520,8 @@ class _TopicsPageState extends State<TopicsPage> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Course'),
         content: Text(
-            'Are you sure you want to delete "${_selectedCourse!.code} - ${_selectedCourse!.name}"?\n\nAll topics in this course will also be deleted.'),
+          'Are you sure you want to delete "${_selectedCourse!.code} - ${_selectedCourse!.name}"?\n\nAll topics in this course will also be deleted.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -603,12 +616,15 @@ class _TopicsPageState extends State<TopicsPage> {
     }
 
     if (topicName.length > 100) {
-      _showSnackBar('Topic name must be less than 100 characters', isError: true);
+      _showSnackBar(
+        'Topic name must be less than 100 characters',
+        isError: true,
+      );
       return;
     }
 
     final exists = _selectedCourse!.topics.any(
-          (t) => t.name.toLowerCase() == topicName.toLowerCase(),
+      (t) => t.name.toLowerCase() == topicName.toLowerCase(),
     );
 
     if (exists) {
@@ -626,7 +642,9 @@ class _TopicsPageState extends State<TopicsPage> {
 
     setState(() {
       _selectedCourse!.topics.insert(0, newTopic);
-      final courseIndex = _courses.indexWhere((c) => c.id == _selectedCourse!.id);
+      final courseIndex = _courses.indexWhere(
+        (c) => c.id == _selectedCourse!.id,
+      );
       if (courseIndex != -1) {
         _courses[courseIndex] = _selectedCourse!;
       }
@@ -652,7 +670,8 @@ class _TopicsPageState extends State<TopicsPage> {
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
         content: Text(
-            'Are you sure you want to delete ${_selectedTopicIds.length} selected topic(s)?'),
+          'Are you sure you want to delete ${_selectedTopicIds.length} selected topic(s)?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -676,7 +695,7 @@ class _TopicsPageState extends State<TopicsPage> {
         if (_selectedCourse != null) {
           try {
             _selectedCourse = _courses.firstWhere(
-                  (c) => c.id == _selectedCourse!.id,
+              (c) => c.id == _selectedCourse!.id,
             );
           } catch (e) {
             _selectedCourse = _courses.isNotEmpty ? _courses.first : null;
@@ -715,7 +734,9 @@ class _TopicsPageState extends State<TopicsPage> {
       widget.semester,
       _courses,
     );
-    _showSnackBar('${ctType.displayName} applied to ${_selectedTopicIds.length} topic(s)');
+    _showSnackBar(
+      '${ctType.displayName} applied to ${_selectedTopicIds.length} topic(s)',
+    );
   }
 
   void _toggleTopicSelection(String topicId) {
@@ -805,7 +826,9 @@ class _TopicsPageState extends State<TopicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.department} - ${widget.year} Year ${widget.semester}'),
+        title: Text(
+          '${widget.department} - ${widget.year} Year ${widget.semester}',
+        ),
         centerTitle: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
@@ -830,252 +853,271 @@ class _TopicsPageState extends State<TopicsPage> {
           ? const Center(child: CircularProgressIndicator())
           : _courses.isEmpty
           ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 16),
-            Text(
-              'No courses available for ${widget.department} ${widget.year} Year ${widget.semester}',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-            if (_userRole.canAddCourse)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton.icon(
-                  onPressed: _showAddCourseDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add First Course'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      )
-          : Column(
-        children: [
-          // Course Selection Row with Add Course Button
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: DropdownButton<Course>(
-                      value: _selectedCourse,
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      hint: const Text('Select Course'),
-                      items: _courses.map((course) {
-                        return DropdownMenuItem(
-                          value: course,
-                          child: Text('${course.code} - ${course.name}'),
-                        );
-                      }).toList(),
-                      onChanged: (course) {
-                        setState(() {
-                          _selectedCourse = course;
-                          _selectedTopicIds.clear();
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                if (_userRole.canAddCourse)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: IconButton(
-                      icon: const Icon(Icons.add_circle, color: Colors.blue),
-                      onPressed: _showAddCourseDialog,
-                      tooltip: 'Add Course',
-                      iconSize: 32,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search topics...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-
-          // CT Action Buttons
-          if (_selectedTopicIds.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Apply to selected:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.grey.shade400,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _buildCTButton(CTType.ct1, Colors.red),
-                      const SizedBox(width: 8),
-                      _buildCTButton(CTType.ct2, Colors.green),
-                      const SizedBox(width: 8),
-                      _buildCTButton(CTType.ct3, Colors.orange),
-                      const SizedBox(width: 8),
-                      _buildCTButton(CTType.ct4, Colors.blue),
-                    ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'No courses available for ${widget.department} ${widget.year} Year ${widget.semester}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600),
                   ),
+                  if (_userRole.canAddCourse)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton.icon(
+                        onPressed: _showAddCourseDialog,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add First Course'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
                 ],
               ),
-            ),
-
-          // Topics List
-          Expanded(
-            child: _selectedCourse == null
-                ? const Center(child: Text('No course selected'))
-                : RefreshIndicator(
-              onRefresh: _initializeData,
-              child: _filteredCourses.isEmpty ||
-                  _filteredCourses
-                      .firstWhere(
-                        (c) => c.id == _selectedCourse!.id,
-                    orElse: () => Course(
-                      id: '',
-                      code: '',
-                      name: '',
-                      topics: [],
-                    ),
-                  )
-                      .topics
-                      .isEmpty
-                  ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.topic,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _searchController.text.isEmpty
-                          ? 'No topics in this course'
-                          : 'No matching topics found',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    if (_userRole.canAddTopic &&
-                        _searchController.text.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton.icon(
-                          onPressed: _showAddTopicDialog,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add First Topic'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+            )
+          : Column(
+              children: [
+                // Course Selection Row with Add Course Button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButton<Course>(
+                            value: _selectedCourse,
+                            isExpanded: true,
+                            underline: const SizedBox(),
+                            hint: const Text('Select Course'),
+                            items: _courses.map((course) {
+                              return DropdownMenuItem(
+                                value: course,
+                                child: Text('${course.code} - ${course.name}'),
+                              );
+                            }).toList(),
+                            onChanged: (course) {
+                              setState(() {
+                                _selectedCourse = course;
+                                _selectedTopicIds.clear();
+                              });
+                            },
                           ),
                         ),
                       ),
-                  ],
+                      if (_userRole.canAddCourse)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.add_circle,
+                              color: Colors.blue,
+                            ),
+                            onPressed: _showAddCourseDialog,
+                            tooltip: 'Add Course',
+                            iconSize: 32,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              )
-                  : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _selectedCourse!.topics.length,
-                itemBuilder: (context, index) {
-                  final topic = _selectedCourse!.topics[index];
-                  final isSelected = _selectedTopicIds.contains(topic.id);
 
-                  if (_searchController.text.isNotEmpty &&
-                      !topic.name
-                          .toLowerCase()
-                          .contains(_searchController.text.toLowerCase())) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: Card(
-                      color: topic.ctType.color,
-                      elevation: isSelected ? 4 : 1,
-                      child: ListTile(
-                        leading: Checkbox(
-                          value: isSelected,
-                          onChanged: (value) {
-                            _toggleTopicSelection(topic.id);
-                          },
-                          activeColor: Colors.blue,
-                        ),
-                        title: Text(
-                          topic.name,
-                          style: TextStyle(
-                            fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                        subtitle: topic.ctType != CTType.none
-                            ? Text(
-                          'Selected as: ${topic.ctType.displayName}',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                            : null,
-                        trailing: _userRole.canDeleteTopic
-                            ? IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            _selectedTopicIds.clear();
-                            _selectedTopicIds.add(topic.id);
-                            _deleteSelectedTopics();
-                          },
-                          color: Colors.red.shade700,
-                        )
-                            : null,
-                        onTap: () {
-                          _toggleTopicSelection(topic.id);
-                        },
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search topics...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                  );
-                },
-              ),
+                  ),
+                ),
+
+                // CT Action Buttons
+                if (_selectedTopicIds.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Apply to selected:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            _buildCTButton(CTType.ct1, Colors.red),
+                            const SizedBox(width: 8),
+                            _buildCTButton(CTType.ct2, Colors.green),
+                            const SizedBox(width: 8),
+                            _buildCTButton(CTType.ct3, Colors.orange),
+                            const SizedBox(width: 8),
+                            _buildCTButton(CTType.ct4, Colors.blue),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Topics List
+                Expanded(
+                  child: _selectedCourse == null
+                      ? const Center(child: Text('No course selected'))
+                      : RefreshIndicator(
+                          onRefresh: _initializeData,
+                          child:
+                              _filteredCourses.isEmpty ||
+                                  _filteredCourses
+                                      .firstWhere(
+                                        (c) => c.id == _selectedCourse!.id,
+                                        orElse: () => Course(
+                                          id: '',
+                                          code: '',
+                                          name: '',
+                                          topics: [],
+                                        ),
+                                      )
+                                      .topics
+                                      .isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.topic,
+                                        size: 64,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        _searchController.text.isEmpty
+                                            ? 'No topics in this course'
+                                            : 'No matching topics found',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      if (_userRole.canAddTopic &&
+                                          _searchController.text.isEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: ElevatedButton.icon(
+                                            onPressed: _showAddTopicDialog,
+                                            icon: const Icon(Icons.add),
+                                            label: const Text(
+                                              'Add First Topic',
+                                            ),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: _selectedCourse!.topics.length,
+                                  itemBuilder: (context, index) {
+                                    final topic =
+                                        _selectedCourse!.topics[index];
+                                    final isSelected = _selectedTopicIds
+                                        .contains(topic.id);
+
+                                    if (_searchController.text.isNotEmpty &&
+                                        !topic.name.toLowerCase().contains(
+                                          _searchController.text.toLowerCase(),
+                                        )) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    return AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      child: Card(
+                                        color: topic.ctType.color,
+                                        elevation: isSelected ? 4 : 1,
+                                        child: ListTile(
+                                          leading: Checkbox(
+                                            value: isSelected,
+                                            onChanged: (value) {
+                                              _toggleTopicSelection(topic.id);
+                                            },
+                                            activeColor: Colors.blue,
+                                          ),
+                                          title: Text(
+                                            topic.name,
+                                            style: TextStyle(
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                            ),
+                                          ),
+                                          subtitle: topic.ctType != CTType.none
+                                              ? Text(
+                                                  'Selected as: ${topic.ctType.displayName}',
+                                                  style: TextStyle(
+                                                    color: Colors.grey.shade700,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                )
+                                              : null,
+                                          trailing: _userRole.canDeleteTopic
+                                              ? IconButton(
+                                                  icon: const Icon(
+                                                    Icons.delete_outline,
+                                                  ),
+                                                  onPressed: () {
+                                                    _selectedTopicIds.clear();
+                                                    _selectedTopicIds.add(
+                                                      topic.id,
+                                                    );
+                                                    _deleteSelectedTopics();
+                                                  },
+                                                  color: Colors.red.shade700,
+                                                )
+                                              : null,
+                                          onTap: () {
+                                            _toggleTopicSelection(topic.id);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       floatingActionButton: _userRole.canAddTopic && _selectedCourse != null
           ? FloatingActionButton.extended(
-        onPressed: _showAddTopicDialog,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Topic'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      )
+              onPressed: _showAddTopicDialog,
+              icon: const Icon(Icons.add),
+              label: const Text('Add Topic'),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            )
           : null,
     );
   }

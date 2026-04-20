@@ -14,7 +14,8 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool isLoading = false;
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
@@ -118,28 +119,29 @@ class _SignUpState extends State<SignUp> {
     setState(() => isLoading = true);
 
     try {
+      print('Starting Firebase Auth signup...');
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+      print('Firebase Auth signup completed');
 
       User? user = userCredential.user;
       if (user != null) {
+        print('Creating user document in Firestore...');
         bool isCR = (user.email == 'test1@gmail.com');
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'email': user.email,
           'isCR': isCR,
           'createdAt': FieldValue.serverTimestamp(),
           'becameCRAt': isCR ? FieldValue.serverTimestamp() : null,
         });
-        Get.offAll(() => Wrapper());
+        print('Firestore document created, signup successful');
+        // Don't navigate manually - let the auth state change trigger the UI update
+        // Get.offAll(() => const Wrapper());
       }
-
     } on FirebaseAuthException catch (e) {
       String message = 'Sign up failed';
       if (e.code == 'email-already-in-use') {
@@ -181,11 +183,7 @@ class _SignUpState extends State<SignUp> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.green.shade50,
-              Colors.white,
-              Colors.green.shade100,
-            ],
+            colors: [Colors.green.shade50, Colors.white, Colors.green.shade100],
           ),
         ),
         child: SafeArea(
@@ -230,10 +228,7 @@ class _SignUpState extends State<SignUp> {
                   Text(
                     'Join the EduBuddy community',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 40),
 
@@ -255,13 +250,17 @@ class _SignUpState extends State<SignUp> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _emailError != null ? Colors.red : Colors.grey.shade300,
+                          color: _emailError != null
+                              ? Colors.red
+                              : Colors.grey.shade300,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _emailError != null ? Colors.red : Colors.green,
+                          color: _emailError != null
+                              ? Colors.red
+                              : Colors.green,
                           width: 2,
                         ),
                       ),
@@ -281,7 +280,9 @@ class _SignUpState extends State<SignUp> {
                       hintText: 'Create a password',
                       prefixIcon: Icon(
                         Icons.lock,
-                        color: _passwordError != null ? Colors.red : Colors.green,
+                        color: _passwordError != null
+                            ? Colors.red
+                            : Colors.green,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -302,13 +303,17 @@ class _SignUpState extends State<SignUp> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _passwordError != null ? Colors.red : Colors.grey.shade300,
+                          color: _passwordError != null
+                              ? Colors.red
+                              : Colors.grey.shade300,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _passwordError != null ? Colors.red : Colors.green,
+                          color: _passwordError != null
+                              ? Colors.red
+                              : Colors.green,
                           width: 2,
                         ),
                       ),
@@ -328,7 +333,9 @@ class _SignUpState extends State<SignUp> {
                       hintText: 'Confirm your password',
                       prefixIcon: Icon(
                         Icons.lock_outline,
-                        color: _confirmPasswordError != null ? Colors.red : Colors.green,
+                        color: _confirmPasswordError != null
+                            ? Colors.red
+                            : Colors.green,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -349,13 +356,17 @@ class _SignUpState extends State<SignUp> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _confirmPasswordError != null ? Colors.red : Colors.grey.shade300,
+                          color: _confirmPasswordError != null
+                              ? Colors.red
+                              : Colors.grey.shade300,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: _confirmPasswordError != null ? Colors.red : Colors.green,
+                          color: _confirmPasswordError != null
+                              ? Colors.red
+                              : Colors.green,
                           width: 2,
                         ),
                       ),
@@ -379,20 +390,20 @@ class _SignUpState extends State<SignUp> {
                     ),
                     child: isLoading
                         ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
                         : const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                            'Sign Up',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 20),
 
