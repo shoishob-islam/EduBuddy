@@ -695,7 +695,7 @@ class PastPollCard extends StatelessWidget {
                 ),
                 if (endDate != null)
                   Text(
-                    "Ended: ${DateFormat.yMMMd().format(endDate!)}",
+                    "Ended: ${DateFormat.yMMMd().format(endDate)}",
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
               ],
@@ -881,7 +881,9 @@ class _CreatePollTabState extends State<CreatePollTab> {
       if (mounted) {
         _titleController.clear();
         _descriptionController.clear();
-        for (var c in _optionControllers) c.clear();
+        for (var c in _optionControllers) {
+          c.clear();
+        }
         setState(() => _endDate = null);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Poll created successfully!")),
@@ -1020,7 +1022,9 @@ class _CreatePollTabState extends State<CreatePollTab> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    for (var c in _optionControllers) c.dispose();
+    for (var c in _optionControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 }

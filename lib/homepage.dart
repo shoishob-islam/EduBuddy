@@ -2,6 +2,7 @@ import 'package:app7/about.dart';
 import 'package:app7/notice.dart';
 import 'package:app7/voting.dart';
 import 'package:app7/content.dart';
+import 'daily_learn.dart';
 import 'package:app7/cr_dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,9 @@ class _HomepageState extends State<Homepage> {
     try {
       await FirebaseAuth.instance.signOut();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error signing out: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error signing out: $e')));
     }
   }
 
@@ -32,9 +33,7 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       drawer: Drawer(
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.teal.shade300,
-          ),
+          decoration: BoxDecoration(color: Colors.teal.shade300),
           child: ListView(
             children: [
               const DrawerHeader(
@@ -47,7 +46,10 @@ class _HomepageState extends State<Homepage> {
               ),
               if (widget.isCR) ...[
                 ListTile(
-                  leading: const Icon(Icons.dashboard_customize, color: Colors.amber),
+                  leading: const Icon(
+                    Icons.dashboard_customize,
+                    color: Colors.amber,
+                  ),
                   title: const Text(
                     "CR Dashboard",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -58,7 +60,8 @@ class _HomepageState extends State<Homepage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CRDashboard(
-                          currentCREmail: FirebaseAuth.instance.currentUser?.email,
+                          currentCREmail:
+                              FirebaseAuth.instance.currentUser?.email,
                         ),
                       ),
                     );
@@ -111,6 +114,20 @@ class _HomepageState extends State<Homepage> {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.menu_book),
+                title: const Text(
+                  "Daily Learn",
+                  style: TextStyle(fontSize: 18),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DailyLearn()),
+                  );
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.info),
                 title: const Text("About", style: TextStyle(fontSize: 18)),
                 onTap: () {
@@ -124,7 +141,10 @@ class _HomepageState extends State<Homepage> {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text("Sign Out", style: TextStyle(fontSize: 18, color: Colors.red)),
+                title: const Text(
+                  "Sign Out",
+                  style: TextStyle(fontSize: 18, color: Colors.red),
+                ),
                 onTap: () async {
                   Navigator.pop(context);
                   await signOut();
@@ -181,11 +201,18 @@ class _HomepageState extends State<Homepage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.account_circle, size: 60, color: Colors.blue),
+                        const Icon(
+                          Icons.account_circle,
+                          size: 60,
+                          color: Colors.blue,
+                        ),
                         const SizedBox(height: 12),
                         Text(
                           'Welcome,',
-                          style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -202,7 +229,10 @@ class _HomepageState extends State<Homepage> {
                         const SizedBox(height: 12),
                         if (widget.isCR)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.amber.shade300,
                               borderRadius: BorderRadius.circular(20),
@@ -274,7 +304,7 @@ class _HomepageState extends State<Homepage> {
                   ),
 
                   const SizedBox(height: 30),
-//Quick acction button
+                  //Quick acction button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -332,12 +362,12 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget _buildQuickActionButton(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
@@ -347,10 +377,7 @@ class _HomepageState extends State<Homepage> {
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
-          ),
+          border: Border.all(color: color.withOpacity(0.3), width: 1),
         ),
         child: Column(
           children: [
