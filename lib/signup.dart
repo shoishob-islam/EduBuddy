@@ -92,26 +92,16 @@ class _SignUpState extends State<SignUp> {
     if (!_isValidEmail(emailController.text.trim())) {
       setState(() => _emailError = 'Please enter a valid email address');
       return;
-    }
-
-    // Validate password
-    if (passwordController.text.isEmpty) {
+    }if (passwordController.text.isEmpty) {
       setState(() => _passwordError = 'Please enter a password');
       return;
-    }
-
-    if (passwordController.text.length < 6) {
+    }if (passwordController.text.length < 6) {
       setState(() => _passwordError = 'Password must be at least 6 characters');
       return;
-    }
-
-    // Validate confirm password
-    if (confirmPasswordController.text.isEmpty) {
+    }if (confirmPasswordController.text.isEmpty) {
       setState(() => _confirmPasswordError = 'Please confirm your password');
       return;
-    }
-
-    if (confirmPasswordController.text != passwordController.text) {
+    }if (confirmPasswordController.text != passwordController.text) {
       setState(() => _confirmPasswordError = 'Passwords do not match');
       return;
     }
@@ -140,8 +130,9 @@ class _SignUpState extends State<SignUp> {
         });
         print('Firestore document created, signup successful');
         // Don't navigate manually - let the auth state change trigger the UI update
-        // Get.offAll(() => const Wrapper());
-      }
+        if (mounted) {
+          Get.offAll(() => const Wrapper());
+        }      }
     } on FirebaseAuthException catch (e) {
       String message = 'Sign up failed';
       if (e.code == 'email-already-in-use') {

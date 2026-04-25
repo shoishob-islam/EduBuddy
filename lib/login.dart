@@ -18,11 +18,8 @@ class LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
   bool obscurePassword = true;
-
-  // Validation states email passward
   String? emailError;
   String? passwordError;
-
   // Email validation function
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(
@@ -66,19 +63,13 @@ class LoginState extends State<Login> {
     if (emailController.text.trim().isEmpty) {
       setState(() => emailError = 'Please enter your email');
       return;
-    }
-
-    if (!_isValidEmail(emailController.text.trim())) {
+    }if (!_isValidEmail(emailController.text.trim())) {
       setState(() => emailError = 'Please enter a valid email address');
       return;
-    }
-
-    if (passwordController.text.isEmpty) {
+    }if (passwordController.text.isEmpty) {
       setState(() => passwordError = 'Please enter your password');
       return;
-    }
-
-    if (passwordController.text.length < 6) {
+    }if (passwordController.text.length < 6) {
       setState(() => passwordError = 'Password must be at least 6 characters');
       return;
     }
@@ -114,7 +105,9 @@ class LoginState extends State<Login> {
               });
         }
 
-        Get.offAll(() => Wrapper());
+        if (mounted) {
+          Get.offAll(() => const Wrapper());
+        }
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Login failed';

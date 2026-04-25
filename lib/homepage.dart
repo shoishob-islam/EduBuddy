@@ -6,6 +6,7 @@ import 'daily_learn.dart';
 import 'package:app7/cr_dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'diganto/community_screen.dart';
 
 class Homepage extends StatefulWidget {
   final bool isCR;
@@ -102,13 +103,26 @@ class _HomepageState extends State<Homepage> {
               ),
               ListTile(
                 leading: const Icon(Icons.content_paste),
-                title: const Text("Content", style: TextStyle(fontSize: 18)),
+                title: const Text("Interactive Syllabus", style: TextStyle(fontSize: 18)),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Content(isCR: widget.isCR),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.question_answer),
+                title: const Text("Doubt Solving", style: TextStyle(fontSize: 18)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CommunityScreen(),
                     ),
                   );
                 },

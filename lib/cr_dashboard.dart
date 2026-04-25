@@ -23,20 +23,7 @@ class _CRDashboardState extends State<CRDashboard> {
           "CR Dashboard",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFFF59E0B),
-                const Color(0xFFD97706),
-                const Color(0xFFB45309),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.orange,
         elevation: 0,
       ),
       body: Container(
@@ -62,9 +49,7 @@ class _CRDashboardState extends State<CRDashboard> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-
             var crs = snapshot.data?.docs ?? [];
-
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               physics: const BouncingScrollPhysics(),
@@ -87,14 +72,7 @@ class _CRDashboardState extends State<CRDashboard> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [const Color(0xFFF59E0B), const Color(0xFFD97706)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+
                                 child: const Icon(
                                   Icons.crop,
                                   color: Colors.white,
@@ -108,7 +86,7 @@ class _CRDashboardState extends State<CRDashboard> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFFB45309),
+                                    color: Colors.orangeAccent,
                                   ),
                                 ),
                               ),
@@ -215,11 +193,7 @@ class _CRDashboardState extends State<CRDashboard> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [const Color(0xFF10B981), const Color(0xFF059669)],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
+
                                             borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: const Text(
@@ -261,11 +235,7 @@ class _CRDashboardState extends State<CRDashboard> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [const Color(0xFFF59E0B), const Color(0xFFD97706)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
+
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Icon(
