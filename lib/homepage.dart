@@ -6,6 +6,14 @@ import 'daily_learn.dart';
 import 'package:app7/cr_dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'Doubt/doubt_model.dart';
+import 'Doubt/doubt_service.dart';
+import 'Doubt/doubt_card.dart';
+import 'ask_doubt_screen.dart';
+import 'animated_subject_text.dart';
+import 'app_theme.dart';
 
 class Homepage extends StatefulWidget {
   final bool isCR;
@@ -124,6 +132,19 @@ class _HomepageState extends State<Homepage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const DailyLearn()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.question_answer, color: Colors.deepPurple),
+                title: const Text("Doubt Solving", style: TextStyle(fontSize: 18)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AskDoubtScreen(),
+                    ),
                   );
                 },
               ),
@@ -252,6 +273,11 @@ class _HomepageState extends State<Homepage> {
 
                   const SizedBox(height: 20),
 
+                  // Doubt Solving Hero Section
+                  _buildDoubtSolvingSection(context),
+
+                  const SizedBox(height: 20),
+
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     padding: const EdgeInsets.all(20),
@@ -304,7 +330,7 @@ class _HomepageState extends State<Homepage> {
                   ),
 
                   const SizedBox(height: 30),
-                  //Quick acction button
+                  //Quick action button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -358,6 +384,178 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDoubtSolvingSection(BuildContext context) {
+    final doubtService = context.read<DoubtService>();
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Hero card
+        Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1A0A35), Color(0xFF0D0D1A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppTheme.neonPurple.withOpacity(0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.neonPurple.withOpacity(0.1),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.neonPurple.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color:
+                              AppTheme.neonPurple.withOpacity(0.3)),
+                    ),
+                    child: Text(
+                      '🎓 Doubt Solving',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: AppTheme.neonPurpleLight,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Need help with',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary,
+                  height: 1.2,
+                ),
+              ),
+              const AnimatedSubjectText(),
+              const SizedBox(height: 10),
+              Text(
+                'Post your doubts, get answers from peers.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Ask bar
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AskDoubtScreen(),
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgCard,
+                    borderRadius: BorderRadius.circular(14),
+                    border:
+                        Border.all(color: AppTheme.borderColor),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.search_rounded,
+                        color: AppTheme.textMuted,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Ask your doubt here...',
+                        style: GoogleFonts.inter(
+                          color: AppTheme.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Recent Doubts Feed
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Text(
+            'Recent Doubts',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        StreamBuilder<List<DoubtModel>>(
+          stream: doubtService.getDoubts(limit: 5),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(
+                      color: AppTheme.neonPurple),
+                ),
+              );
+            }
+            final doubts = snapshot.data ?? [];
+            if (doubts.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    'No doubts posted yet. Be the first!',
+                    style: GoogleFonts.inter(
+                        color: AppTheme.textSecondary,
+                        fontSize: 13),
+                  ),
+                ),
+              );
+            }
+            return Column(
+              children: doubts.map((doubt) {
+                return DoubtCard(
+                  doubt: doubt,
+                  currentUserId: currentUserId,
+                  onUpvote: () => doubtService.upvoteDoubt(
+                    doubt.id,
+                    currentUserId,
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 
